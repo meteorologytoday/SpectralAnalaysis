@@ -25,6 +25,7 @@ module SpectralAnalysis
     function computeSpectrum(
         arr :: AbstractArray{T};
         smoothing :: String = "none",
+        lag_window_M :: Int64 = -1,
     ) where T <: AbstractFloat
 
         N = length(arr)
@@ -46,7 +47,8 @@ module SpectralAnalysis
         if smoothing == "none"
             λ = ones(T, N)
         elseif smoothing in ["Tukey", "Parzen"]
-            λ = _lag_window(N, floor(Int64, N/3), smoothing; dtype=T)
+            lag_window_M = (lag_window_M == -1) ? floor(Int64, N/3) : lag_window_M
+            λ = _lag_window(N, lag_window_M, smoothing; dtype=T)
         else
             throw(ErrorException("Unknown smoothing method: $(smoothing). Only 'none', 'Tukey', and 'Parzen' are allowed."))
         end
